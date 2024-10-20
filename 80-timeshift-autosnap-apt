@@ -1,1 +1,2 @@
-DPkg::Pre-Invoke {"/usr/bin/timeshift-autosnap-apt"; };
+DPkg::Pre-Install-Pkgs {"/usr/bin/timeshift-autosnap-apt PRE";};
+DPkg::Post-Invoke {"/usr/bin/timeshift-autosnap-apt POST";};
