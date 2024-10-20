@@ -113,7 +113,7 @@ pre() {
     verify_if_skip
     rsync_boot
     rsync_boot_efi
-    id_counter=get_id_counter
+    id_counter=$(get_id_counter)
     run_timeshift "{timeshift-autosnap-apt} Before APT call, ID: #$id_counter"
 }
 
