@@ -12,8 +12,9 @@ readonly CONF_FILE=/etc/timeshift-autosnap-apt.conf
 readonly SNAPSHOTS_TO_DELETE=$(mktemp -u --tmpdir "${0##*/}".XXXXXXXX)
 
 readonly SNAPSHOT_NAME_DATE_PATTERN="[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}_[0-9]\{2\}-[0-9]\{2\}-[0-9]\{2\}"
+readonly VAR_PATH="/var/lib/timeshift-autosnap-apt"
+readonly ="$VAR_PATH/counter"
 
-id_counter=""
 
 get_property() {
     if [ ! -f $CONF_FILE ]; then
@@ -34,28 +35,32 @@ get_property() {
     echo "$param_value"
 }
 
+## Get or Create ID counter file
 get_id_counter() {
-    var_path="/var/lib/timeshift-autosnap-apt"
-    counter_file="$var_path/counter"
 
-    if [ ! -d "$var_path" ]; then
-        mkdir -p "$var_path"
-        chmod 700 "$var_path"
+    if [ ! -d "$VAR_PATH" ]; then
+        mkdir -p "$VAR_PATH"
+        chmod 700 "$VAR_PATH"
     fi
 
     # Check if the counter file exists; if not, initialize it with 0
-    if [ ! -f "$counter_file" ]; then
-        echo 0 > "$counter_file"
+    if [ ! -f "$COUNTER_FILE" ]; then
+        echo 0 > "$COUNTER_FILE"
     fi
     # Read the current counter value from the file
-    counter=$(cat "$counter_file")
+    counter=$(cat "$COUNTER_FILE")
 
+    echo "$counter"
+}
+
+increment_id_counter() {
+    counter = $(get_id_counter)
     # Increment the counter
     counter=$((counter + 1))
 
     # Save the new counter value back to the file
-    echo "$counter" > "$counter_file"
-    echo "$counter"
+    echo "$counter" > "$COUNTER_FILE"
+
 }
 verify_if_skip() {
     if $(get_property "skipAutosnap" "boolean" "false") ; then
@@ -120,7 +125,9 @@ pre() {
 post() {
     verify_if_skip
     delete_snapshots
+    id_counter=$(get_id_counter)
     run_timeshift "{timeshift-autosnap-apt} After APT call, ID: #$id_counter"
+    increment_id_counter
     update_grub
 }
 
