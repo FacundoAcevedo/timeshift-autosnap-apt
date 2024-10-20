@@ -54,7 +54,7 @@ get_id_counter() {
 }
 
 increment_id_counter() {
-    counter = $(get_id_counter)
+    counter=$(get_id_counter)
     # Increment the counter
     counter=$((counter + 1))
 
